@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class RegistrationController {
 
     @PostMapping("/registration")
     private String createUser(User user, Map<String, Object> model) {
-        User userFromRepo = repository.findByName(user.getUsername());
+        User userFromRepo = repository.findByUsername(user.getUsername());
 
         if (userFromRepo!=null ){
             model.put("message", "User exists!");

@@ -1,11 +1,12 @@
 package com.example.sweeting.controller;
 
-import com.example.sweeting.repository.MessageRepository;
 import com.example.sweeting.model.Message;
 import com.example.sweeting.model.User;
+import com.example.sweeting.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,14 +20,24 @@ public class MainController {
     private MessageRepository repository;
 
     @GetMapping("/")
-    public String greeting(Map<String, Object> model) {
-        return "greeting";
+    public String greeting() {
+        return "greetings";
     }
 
+
     @GetMapping("/main")
-    public String main(Map<String, Object> model) {
+    public String main(@RequestParam(required = false) String filter, Model model) {
         Iterable<Message> messages = repository.findAll();
-        model.put("some", messages);
+
+        if (filter != null && !filter.isEmpty()) {
+            messages = repository.findByTag(filter);
+        } else {
+            messages = repository.findAll();
+        }
+
+        model.addAttribute("messages", messages);
+        model.addAttribute("filter", messages);
+
         return "main";
     }
 
@@ -41,19 +52,7 @@ public class MainController {
         Iterable<Message> messages = repository.findAll();
         model.put("some", messages);
 
-        return "main";
-    }
-
-    @PostMapping("filter")
-    public String filter(@RequestParam String filter, Map<String, Object> model) {
-        Iterable<Message> messages = null;
-        if (filter != null && !filter.isEmpty()) {
-            messages = repository.findByTag(filter);
-        } else {
-            repository.findAll();
-        }
-        model.put("some", messages);
-        return "main";
+        return "redirect:/main";
     }
 
 }
